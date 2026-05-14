@@ -5,58 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AlgoBot — by Cognospace</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-  // ══════════════════════════════════════
-  // 🔥 REPLACE WITH YOUR FIREBASE CONFIG
-  // ══════════════════════════════════════
-  const firebaseConfig = {
-    apiKey: "AIzaSyCTbiEm3iXSr3ACP2kpcsDLjl_LQlaejnk",
-    authDomain: "algobot-86890.firebaseapp.com",
-    databaseURL: "https://algobot-86890-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "algobot-86890",
-    storageBucket: "algobot-86890.firebasestorage.app",
-    messagingSenderId: "966378143238",
-    appId: "1:966378143238:web:d331622dc6952db2a7cd87",
-    measurementId: "G-ZN7REB8E57"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const lbRef = ref(db, 'algobot_leaderboard');
-
-  // Save or update an entry (keeps best score per team+school)
-  window._fbSaveEntry = async function(entry) {
-    try {
-      const snapshot = await get(lbRef);
-      const data = snapshot.val() || {};
-      const key = (entry.name + '|' + entry.school).replace(/[.#$[\]/]/g, '_');
-      const existing = data[key];
-      if (!existing || entry.points > existing.points ||
-          (entry.points === existing.points && entry.totalTime < existing.totalTime)) {
-        await set(ref(db, 'algobot_leaderboard/' + key), entry);
-      }
-    } catch(e) {
-      console.error('Firebase save error:', e);
-    }
-  };
-
-  // Real-time listener — fires on every device when data changes
-  window._fbListenLeaderboard = function(callback) {
-    onValue(lbRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      const lb = Object.values(data);
-      lb.sort((a, b) => b.points - a.points || (a.totalTime - b.totalTime));
-      callback(lb);
-    });
-  };
-
-  window._firebaseReady = true;
-  document.dispatchEvent(new Event('firebaseReady'));
-</script>
 <style>
 :root {
   --bg: #f0f4ff;
@@ -645,7 +593,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="logo-badge">🤖</div>
       <div>
         <div class="logo-name">Algo<span>Bot</span></div>
-        <div class="logo-sub"><img src="./cognospace-logo.png" alt="Cognospace" style="height:22px;vertical-align:middle;display:inline-block;margin-top:2px;"></div>
+        <div class="logo-sub"><img src="cognospace_logo.png" alt="Cognospace" style="height: 40px;width: auto;vertical-align:middle;display:inline-block;margin-top:2px;"></div>
       </div>
     </div>
     <div class="landing-title">Algorithm Design Lab</div>
@@ -656,7 +604,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="or-divider">or</div>
       <button class="btn-landing btn-leaderboard-landing" onclick="showLeaderboard('landing')">🏆 View Leaderboard</button>
     </div>
-    <div class="landing-footer">© 2025 Cognospace · Designed for young minds ✨</div>
+    <div class="landing-footer">© 2026 Cognospace · Designed for young minds ✨</div>
   </div>
 </div>
 
@@ -715,7 +663,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="gh-logo" style="display:flex;align-items:center;gap:10px;">
         <span>Algo<span style="color:var(--accent2)">Bot</span></span>
         <span style="width:1.5px;height:20px;background:rgba(99,102,241,0.2);display:inline-block;border-radius:2px;"></span>
-        <img src="./cognospace-logo.png" alt="Cognospace" style="height:20px;vertical-align:middle;display:inline-block;opacity:0.9;">
+        <img src="cognospace_logo.png" alt="Cognospace" style="height:50px;vertical-align:middle;display:inline-block;opacity:0.9;">
       </div>
       <div class="gh-puzzle-info">
         <span class="gh-puzzle-num" id="ghPuzzleNum">PUZZLE 1 OF 10</span>
@@ -823,21 +771,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- LEADERBOARD PAGE -->
 <div id="leaderboardPage">
   <div class="lb-header">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div class="lb-title">🏆 <span>Leaderboard</span></div>
-      <span id="lbLiveIndicator" style="display:none;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#10b981;background:#d1fae5;border:1.5px solid #6ee7b7;border-radius:99px;padding:3px 10px;">
-        <span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block;animation:dotPulse 1s ease-in-out infinite;"></span>
-        LIVE
-      </span>
-    </div>
+    <div class="lb-title">🏆 <span>Leaderboard</span></div>
     <button class="btn btn-reset" style="padding:8px 14px;font-size:13px;" id="lbBackBtn" onclick="lbGoBack()">← Back</button>
   </div>
   <div class="lb-body">
     <div class="lb-stats" id="lbStats"></div>
-    <div id="lbLoadingMsg" style="text-align:center;padding:40px;color:var(--text-muted);font-weight:700;font-size:14px;">
-      ⏳ Loading leaderboard...
-    </div>
-    <div class="lb-table-wrap" id="lbTableWrap" style="display:none;">
+    <div class="lb-table-wrap">
       <table class="lb-table">
         <thead>
           <tr>
@@ -1145,9 +1084,7 @@ let completedPuzzles=[];
 let lbReturnTo='landing';
 let touchDragBlock=null;
 
-const LB_KEY='algobot_leaderboard_v3'; // kept for reference only — data now in Firebase
-let _lbListenerStarted = false; // ensure we only register the real-time listener once
-let _cachedLB = []; // latest snapshot from Firebase
+const LB_KEY='algobot_leaderboard_v3';
 
 // ══════════════════════════════════════
 // OVERLAY HELPERS
@@ -1610,10 +1547,11 @@ function confirmQuit(){
 }
 
 // ══════════════════════════════════════
-// LEADERBOARD — Firebase real-time, shared across all devices
+// LEADERBOARD — only shows when data exists
 // ══════════════════════════════════════
 function saveToLeaderboard(lastTime){
   if(!currentStudent)return;
+  let lb=getLB();
   const entry={
     name:currentStudent.name,
     school:currentStudent.school,
@@ -1625,56 +1563,43 @@ function saveToLeaderboard(lastTime){
     completedAt:new Date().toISOString(),
     completed:completedPuzzles.filter(c=>c.status==='completed').length===PUZZLES.length
   };
-  // Save via Firebase (defined in the module script in <head>)
-  if(window._fbSaveEntry){
-    window._fbSaveEntry(entry);
-  }
+  const key=`${entry.name}|${entry.school}`;
+  const existing=lb.findIndex(e=>`${e.name}|${e.school}`===key);
+  if(existing>=0){
+    if(entry.points>lb[existing].points||(entry.points===lb[existing].points&&entry.totalTime<lb[existing].totalTime)){
+      lb[existing]=entry;
+    }
+  } else {lb.push(entry);}
+  lb.sort((a,b)=>b.points-a.points||(a.totalTime-b.totalTime));
+  localStorage.setItem(LB_KEY,JSON.stringify(lb));
 }
 
-function _startLbListener(){
-  if(_lbListenerStarted)return;
-  _lbListenerStarted=true;
-  if(window._fbListenLeaderboard){
-    window._fbListenLeaderboard(function(lb){
-      _cachedLB=lb;
-      // If leaderboard page is currently visible, re-render live
-      const lp=document.getElementById('leaderboardPage');
-      if(lp && (lp.style.display==='flex' || lp.classList.contains('visible'))){
-        _renderLbFromCache();
-      }
-    });
-    // Show LIVE badge
-    const badge=document.getElementById('lbLiveIndicator');
-    if(badge)badge.style.display='flex';
-  }
-}
-
-// Start listener as soon as Firebase is ready
-if(window._firebaseReady){
-  _startLbListener();
-} else {
-  document.addEventListener('firebaseReady', _startLbListener);
+function getLB(){
+  try{return JSON.parse(localStorage.getItem(LB_KEY)||'[]');}catch{return[];}
 }
 
 function renderLeaderboard(){
-  // Trigger listener start if not yet started
-  _startLbListener();
-  _renderLbFromCache();
-}
+  const lb=getLB();
 
-function _renderLbFromCache(){
-  const lb=_cachedLB;
-  const loading=document.getElementById('lbLoadingMsg');
-  const tableWrap=document.getElementById('lbTableWrap');
+  // Stats — only show if data exists
   const statsEl=document.getElementById('lbStats');
-
-  // Hide loading once we have any response (even empty)
-  if(loading)loading.style.display='none';
-  if(tableWrap)tableWrap.style.display='';
-
   if(lb.length===0){
     statsEl.innerHTML='';
-    document.getElementById('lbTableBody').innerHTML=`
+  } else {
+    const totalTables=lb.length;
+    const schools=[...new Set(lb.map(e=>e.school))].length;
+    const topScore=lb[0]?.points||0;
+    statsEl.innerHTML=`
+      <div class="lb-stat"><span class="lb-stat-val">${totalTables}</span><span class="lb-stat-lbl">Tables</span></div>
+      <div class="lb-stat"><span class="lb-stat-val">${schools}</span><span class="lb-stat-lbl">Schools</span></div>
+      <div class="lb-stat"><span class="lb-stat-val">${topScore}</span><span class="lb-stat-lbl">Top Score</span></div>
+      <div class="lb-stat"><span class="lb-stat-val">${PUZZLES.length}</span><span class="lb-stat-lbl">Puzzles</span></div>
+    `;
+  }
+
+  const tbody=document.getElementById('lbTableBody');
+  if(lb.length===0){
+    tbody.innerHTML=`
       <tr><td colspan="6">
         <div class="lb-empty">
           <span class="lb-empty-icon">🏆</span>
@@ -1685,17 +1610,7 @@ function _renderLbFromCache(){
     return;
   }
 
-  const totalTables=lb.length;
-  const schools=[...new Set(lb.map(e=>e.school))].length;
-  const topScore=lb[0]?.points||0;
-  statsEl.innerHTML=`
-    <div class="lb-stat"><span class="lb-stat-val">${totalTables}</span><span class="lb-stat-lbl">Tables</span></div>
-    <div class="lb-stat"><span class="lb-stat-val">${schools}</span><span class="lb-stat-lbl">Schools</span></div>
-    <div class="lb-stat"><span class="lb-stat-val">${topScore}</span><span class="lb-stat-lbl">Top Score</span></div>
-    <div class="lb-stat"><span class="lb-stat-val">${PUZZLES.length}</span><span class="lb-stat-lbl">Puzzles</span></div>
-  `;
-
-  document.getElementById('lbTableBody').innerHTML=lb.map((e,i)=>{
+  tbody.innerHTML=lb.map((e,i)=>{
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
     const rankCls=i===0?'lb-rank-gold':i===1?'lb-rank-silver':i===2?'lb-rank-bronze':'lb-rank';
     const badge=e.completed?`<span class="lb-badge">✓ All Done</span>`:'';
